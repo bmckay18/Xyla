@@ -1,13 +1,26 @@
+:root {
+    --background-color: #101B24;
+    --primary-color: white;
+    --font-family: Arial, Helvetica, sans-serif;
+    --font-size: 16px;
+
+    --border-color: white;
+}
+
 body {
     margin: 0px;
-    background-color: #101B24;
-    color: white;
-    font-size: 16px;
-    font-family:Arial, Helvetica, sans-serif
+    background-color: var(--background-color);
+    color: var(--primary-color);
+    font-size: var(--font-size);
+    font-family: var(--font-family);
+}
+
+h1 {
+    font-size: inherit;
 }
 
 .header {
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: center;
     padding: 0.5rem 0;
@@ -15,7 +28,7 @@ body {
 }
 
 .header a {
-    color:white;
+    color: var(--primary-color);
 }
 
 .main-section {
@@ -23,37 +36,35 @@ body {
     margin: 1rem;
     gap: 1rem;
     flex-direction: column;
-    align-items: center;
-}
-
-@media (min-width: 1024px) {
-    .main-section {
-        flex-direction: row;
-        align-items:flex-start;
-    }
+    align-items: stretch;
 }
 
 .game-area {
     display: flex;
-    justify-content:center;
-    width: 70%;
-    border: 1px solid white;
+    justify-content: center;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     min-height: 30vw;
 }
 
-.lobby,
-.settings {
-    display:flex;
-    justify-content: center;
-}
-
-.lobby-section {
-    border: 1px solid white;
+.game-details {
+    border: 1px solid var(--border-color);
     border-radius: 5px;
     flex: 1;
 }
 
-h1 {
-    font-size: inherit;
+.lobby-section {
+    display: flex;
+    justify-content: center;
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .main-section {
+        flex-direction: row;
+    }
+
+    .game-area {
+        width: 70%;
+    }
 }
