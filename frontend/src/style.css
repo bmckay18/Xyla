@@ -1,0 +1,57 @@
+body {
+    margin: 0px;
+    background-color: #101B24;
+    color: white;
+    font-size: 16px;
+    font-family:Arial, Helvetica, sans-serif
+}
+
+.header {
+    border-bottom: 1px solid white;
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 0;
+    gap: 1rem;
+}
+
+.header a {
+    color:white;
+}
+
+.main-section {
+    display: flex;
+    margin: 1rem;
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .main-section {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.game-area {
+    display: flex;
+    justify-content:center;
+    width: 70%;
+    border: 1px solid white;
+    border-radius: 5px;
+    min-height: 30vw;
+}
+
+.lobby,
+.settings {
+    display:flex;
+    justify-content: center;
+}
+
+.lobby-section {
+    border: 1px solid white;
+    border-radius: 5px;
+    flex: 1;
+}
+
+h1 {
+    font-size: inherit;
+}
