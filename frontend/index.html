@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <link rel="stylesheet" href="https://ka-f.webawesome.com/webawesome@3.10.0/styles/webawesome.css" />
+    <script type="module" src="https://ka-f.webawesome.com/webawesome@3.10.0/webawesome.loader.js"></script>
+
     <title>Foly</title>
   </head>
   <body>
@@ -11,8 +14,23 @@
       <a href="./src/pages/lobby/lobby.html">Home</a>
     </div>
 
-    <div>
-      
+    <div class="lobby-selection">
+      <h1>Create A Lobby</h1>
+      <form id="create-lobby-form">
+        <wa-input name="displayName" label="Display Name"></wa-input>
+        <wa-input name="password" label="Password" hint="Leave blank for no password"></wa-input>
+
+        <wa-button class="submit" variant="success" type="submit">Create Lobby</wa-button>
+      </form>
+
+      <h1>Join A Lobby</h1>
+
+      <form id="join-lobby-form">
+        <wa-input name="displayName" label="Display Name"></wa-input>
+        <wa-input name="lobbyId" label="Lobby ID"></wa-input>
+
+        <wa-button class="submit" variant="success" type="submit">Join Lobby</wa-button>
+      </form>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

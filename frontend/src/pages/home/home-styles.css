@@ -1,0 +1,25 @@
+.lobby-selection {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem auto;
+    width: 25%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+}
+
+form {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: column;
+}
+
+wa-button.submit::part(label) {
+    color: var(--primary-color);
+}
+
+wa-input::part(label) {
+    color: var(--primary-color);
+}
