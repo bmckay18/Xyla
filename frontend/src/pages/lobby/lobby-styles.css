@@ -8,7 +8,8 @@
 
 .game-area {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
 }
@@ -22,6 +23,10 @@
 .lobby-section {
     display: flex;
     justify-content: center;
+}
+
+.game-section {
+    align-self: center;
 }
 
 /* Desktop */
