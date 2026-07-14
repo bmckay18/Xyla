@@ -1,0 +1,42 @@
+.main-section {
+    display: flex;
+    margin: 1rem;
+    gap: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.game-details {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    flex: 1;
+}
+
+.lobby-section {
+    display: flex;
+    justify-content: center;
+}
+
+.game-section {
+    align-self: center;
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .main-section {
+        flex-direction: row;
+    }
+
+    .game-area {
+        width: 70%;
+        min-height: 30vw;
+    }
+}

@@ -4,29 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Foly</title>
+    <link rel="stylesheet" href="https://ka-f.webawesome.com/webawesome@3.10.0/styles/webawesome.css" />
+    <script type="module" src="https://ka-f.webawesome.com/webawesome@3.10.0/webawesome.loader.js"></script>
+
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="stylesheet" href="./src/pages/home/home-styles.css" />    
+
+    <title>Mooti</title>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-
     <div class="header">
-      <a href="./index.html">Home</a>
-      <a href="./index.html">Game</a>
+      <a href="./src/pages/lobby/lobby.html">Home</a>
     </div>
 
-    <div class="main-section">
-      <div class="game-area">
-        <h1>Game: None Selected</h1>
-      </div>
-      <div class="game-details">
-        <div class="lobby-section">
-          <h1>Lobby</h1>
-        </div>
-        <div class="lobby-section">
-          <h1>Game Settings</h1>
-        </div>
-      </div>
+    <div class="lobby-selection">
+      <h1>Create A Lobby</h1>
+      <form id="create-lobby-form">
+        <wa-input name="displayName" label="Display Name"></wa-input>
+        <wa-input name="password" label="Password" hint="Leave blank for no password"></wa-input>
+
+        <wa-button variant="success" type="submit">Create Lobby</wa-button>
+      </form>
+
+      <h1>Join A Lobby</h1>
+
+      <form id="join-lobby-form">
+        <wa-input name="displayName" label="Display Name"></wa-input>
+        <wa-input name="lobbyId" label="Lobby ID"></wa-input>
+
+        <wa-button variant="success" type="submit">Join Lobby</wa-button>
+      </form>
     </div>
+
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
