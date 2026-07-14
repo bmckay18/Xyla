@@ -1,6 +1,7 @@
 :root {
     --background-color: #101B24;
     --primary-color: white;
+    --hover-color: #fcba03;
     --font-family: Arial, Helvetica, sans-serif;
     --font-size: 16px;
 
@@ -8,9 +9,12 @@
     --border-radius: 5px;
 }
 
+html, body {
+    background-color: var(--background-color);
+}
+
 body {
     margin: 0px;
-    background-color: var(--background-color);
     color: var(--primary-color);
     font-size: var(--font-size);
     font-family: var(--font-family);
@@ -30,4 +34,10 @@ h1 {
 
 .header a {
     color: var(--primary-color);
+    text-decoration: none;
+}
+
+.header a:hover {
+    text-decoration: underline;
+    color: var(--hover-color);
 }
