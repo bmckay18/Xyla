@@ -23,16 +23,16 @@ function setupLobby(state: GameState): void {
     const roleElement = document.createElement('h2');
     roleElement.innerText = `Role: ${state.role}`;
 
-    const itemElement = document.createElement('p');
+    const wordElement = document.createElement('p');
 
     gameSection.appendChild(roleElement);
-    gameSection.appendChild(itemElement);
+    gameSection.appendChild(wordElement);
     
     if (state.hint) {
-        itemElement.innerText = `Hint: ${state.hint}`;
+        wordElement.innerText = `Hint: ${state.hint}`;
     }
-    else if (state.item) {
-        itemElement.innerText = `Item: ${state.item}`;
+    else if (state.word) {
+        wordElement.innerText = `Word: ${state.word}`;
     }
 }
 

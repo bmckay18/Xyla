@@ -4,9 +4,8 @@ import { setGameName } from "../core/setGameName";
 
 export function impostersGame(): void {
     setGameState({
-        playerId: "123",
-        role: "Johnny",
-        hint: "Hey"
+        role: "Innocent",
+        word: "Hey"
     });
 
     setGameName("Imposters");

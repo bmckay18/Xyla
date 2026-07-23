@@ -1,7 +1,8 @@
+type Role = "Imposter" | "Innocent"
+
 export interface GameState {
-    playerId: string;
-    role: string;
-    item?: string;
+    role: Role;
+    word?: string;
     hint?: string;
 }
 
