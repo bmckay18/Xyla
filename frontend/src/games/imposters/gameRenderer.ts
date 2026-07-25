@@ -1,4 +1,5 @@
 import { getGameState } from "./gameState";
+import { setPageTitle } from "../../pages/lobby/setPageTitle";
 import type { GameState } from "./gameState";
 
 export function renderImposters(): void {
@@ -8,6 +9,7 @@ export function renderImposters(): void {
         return;
     }
 
+    setPageTitle('Imposters');
     setupLobby(state);
 }
 
