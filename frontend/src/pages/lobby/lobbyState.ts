@@ -26,13 +26,23 @@ export function renderPlayers(state: LobbyState): void {
         const row = document.createElement('tr');
 
         const iconCell = document.createElement('td');
-        //Implement later
+        
+        if (player.id === state.hostId) {
+            iconCell.textContent = 'Host';
+        }
 
         const nameCell = document.createElement('td');
         nameCell.textContent = player.name;
 
         const kickButtonCell = document.createElement('td');
-        //Implement later
+        const kickButton = document.createElement('wa-button');
+
+        kickButton.setAttribute('variant','danger');
+        kickButton.setAttribute('size', 's');
+
+        kickButton.textContent = 'Kick';
+
+        kickButtonCell.appendChild(kickButton);
 
         row.appendChild(iconCell);
         row.appendChild(nameCell);
