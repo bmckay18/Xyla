@@ -1,6 +1,7 @@
 import { getGameState } from "./gameState";
 import { setPageTitle } from "../../pages/lobby/setPageTitle";
 import type { GameState } from "./gameState";
+import { getNewImpostersGamestate } from "./startImposters";
 
 export function renderImposters(): void {
     const state = getGameState();
@@ -11,6 +12,7 @@ export function renderImposters(): void {
 
     setPageTitle('Imposters');
     setupLobby(state);
+    setupSettings();
 }
 
 function setupLobby(state: GameState): void {
@@ -38,3 +40,32 @@ function setupLobby(state: GameState): void {
     }
 }
 
+function setupNewGame(): void {
+    getNewImpostersGamestate();
+
+    const state = getGameState();
+
+    if (!state) {
+        return;
+    }
+
+    setupLobby(state);
+}
+
+function setupSettings(): void {
+    const gameSettings = document.getElementById('game-settings');
+
+    if (!gameSettings) {
+        return;
+    }
+
+    const startGameButton = document.createElement('wa-button');
+    startGameButton.textContent = 'Start Game';
+    startGameButton.setAttribute('variant', 'brand');
+
+    startGameButton.addEventListener('click', () => {
+        setupNewGame();
+    })
+
+    gameSettings.appendChild(startGameButton);
+}
