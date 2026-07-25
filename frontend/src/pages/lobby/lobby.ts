@@ -1,4 +1,4 @@
-import { impostersGame } from "../../games/imposters/imposters";
+import { startImposters } from "../../games/imposters/imposters";
 import { renderPlayers } from "./lobbyState";
 import type { LobbyState } from "./lobbyState";
 
@@ -19,4 +19,4 @@ const mockLobbyState: LobbyState = {
 
 renderPlayers(mockLobbyState);
 
-impostersGame();
+startImposters();

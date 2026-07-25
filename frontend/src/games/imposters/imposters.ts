@@ -1,12 +1,9 @@
-import { setGameState } from "./gameState";
 import { renderImposters } from "./gameRenderer";
 import { setGameName } from "../core/setGameName";
+import { getNewImpostersGamestate } from "./startImposters";
 
-export function impostersGame(): void {
-    setGameState({
-        role: "Innocent",
-        word: "Hey"
-    });
+export function startImposters(): void {
+    getNewImpostersGamestate();
 
     setGameName("Imposters");
     renderImposters();
