@@ -1,3 +1,3 @@
 export const appSettings = {
-    name: "Mooti"
+    name: "Xyla"
 };
