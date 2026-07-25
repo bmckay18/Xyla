@@ -63,9 +63,7 @@ function setupSettings(): void {
     startGameButton.textContent = 'Start Game';
     startGameButton.setAttribute('variant', 'brand');
 
-    startGameButton.addEventListener('click', () => {
-        setupNewGame();
-    })
+    startGameButton.addEventListener('click', setupNewGame);
 
     gameSettings.appendChild(startGameButton);
 }
