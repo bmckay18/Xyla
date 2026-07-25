@@ -1,5 +1,5 @@
 import { getGameState } from "./gameState";
-import { setPageTitle } from "../../pages/lobby/setPageTitle";
+import { setLobbyPageTitle } from "../../pages/lobby/setLobbyPageTitle";
 import type { GameState } from "./gameState";
 import { getNewImpostersGamestate } from "./startImposters";
 
@@ -10,7 +10,7 @@ export function renderImposters(): void {
         return;
     }
 
-    setPageTitle('Imposters');
+    setLobbyPageTitle('Imposters');
     setupLobby(state);
     setupSettings();
 }
@@ -63,9 +63,7 @@ function setupSettings(): void {
     startGameButton.textContent = 'Start Game';
     startGameButton.setAttribute('variant', 'brand');
 
-    startGameButton.addEventListener('click', () => {
-        setupNewGame();
-    })
+    startGameButton.addEventListener('click', setupNewGame);
 
     gameSettings.appendChild(startGameButton);
 }
