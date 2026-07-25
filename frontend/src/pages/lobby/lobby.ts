@@ -2,7 +2,7 @@ import { impostersGame } from "../../games/imposters/imposters";
 import { renderPlayers } from "./lobbyState";
 import type { LobbyState } from "./lobbyState";
 
-const lobbyState: LobbyState = {
+const mockLobbyState: LobbyState = {
     players: [
         {
             id: "1",
@@ -14,9 +14,9 @@ const lobbyState: LobbyState = {
         }
     ],
     hostId: "4",
-    currentPlayerId: "1"
+    currentPlayerId: "4"
 }
 
-renderPlayers(lobbyState);
+renderPlayers(mockLobbyState);
 
 impostersGame();

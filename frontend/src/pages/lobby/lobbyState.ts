@@ -9,7 +9,7 @@ export interface Player {
     name: string;
 }
 
-export function isHost(state: LobbyState): boolean {
+function isHost(state: LobbyState): boolean {
     return state.currentPlayerId === state.hostId;
 }
 
@@ -34,20 +34,22 @@ export function renderPlayers(state: LobbyState): void {
         const nameCell = document.createElement('td');
         nameCell.textContent = player.name;
 
-        const kickButtonCell = document.createElement('td');
-        const kickButton = document.createElement('wa-button');
-
-        kickButton.setAttribute('variant','danger');
-        kickButton.setAttribute('size', 's');
-
-        kickButton.textContent = 'Kick';
-
-        kickButtonCell.appendChild(kickButton);
-
         row.appendChild(iconCell);
         row.appendChild(nameCell);
-        row.appendChild(kickButtonCell);
 
+        if (isHost(state)) {
+            const kickButtonCell = document.createElement('td');
+            const kickButton = document.createElement('wa-button');
+
+            kickButton.setAttribute('variant','danger');
+            kickButton.setAttribute('size', 's');
+
+            kickButton.textContent = 'Kick';
+
+            kickButtonCell.appendChild(kickButton);
+            row.appendChild(kickButtonCell);
+        }     
+        
         tbody.appendChild(row);
-    })
+    });
 }
