@@ -25,7 +25,31 @@
 
 .lobby-section {
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+}
+
+.lobby-section table {
+    max-width: 50%;
+}
+
+.lobby-section tr {
+    border: none;
+}
+
+.lobby-section td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.lobby-section td:nth-child(3) {
+    max-width: 3rem;
+}
+
+.host-image {
+    width: 1rem;
+    height: 1rem;
 }
 
 .game-section {
