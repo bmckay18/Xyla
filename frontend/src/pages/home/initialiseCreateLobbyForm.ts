@@ -8,7 +8,7 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
         return;
     }
 
-    form.addEventListener('submit', async (e: SubmitEvent) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         submitButton.setAttribute('loading','');
