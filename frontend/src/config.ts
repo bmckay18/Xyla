@@ -1,3 +1,4 @@
 export const appSettings = {
-    name: "Xyla"
+    name: "Xyla",
+    baseUrl: "https://localhost:7154"
 };

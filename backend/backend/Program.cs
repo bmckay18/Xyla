@@ -4,14 +4,25 @@ using Backend.Services.Lobbies;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS policies
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 
-//Define my services
+// Define custom services
 builder.Services.AddSingleton<ILobbyService, LobbyService>();
 
-//Define mapping
+// Define automapping
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<LobbyMappingProfile>();
@@ -19,6 +30,8 @@ builder.Services.AddAutoMapper(cfg =>
 
 // Build app
 var app = builder.Build();
+
+app.UseCors("Frontend");
 
 app.UseHttpsRedirection();
 
