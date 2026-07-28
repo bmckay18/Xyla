@@ -2,7 +2,7 @@ import { appSettings } from "../../config";
 
 export async function initialiseCreateLobbyForm(): Promise<void> {
     const form = document.getElementById('create-lobby-form') as HTMLFormElement;
-    const submitButton = document.getElementById('create-lobby-form');
+    const submitButton = document.getElementById('create-lobby-button');
 
     if (!form || !submitButton) {
         return;
@@ -10,6 +10,8 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
 
     form.addEventListener('submit', async (e: SubmitEvent) => {
         e.preventDefault();
+
+        submitButton.setAttribute('loading','');
 
         const data = new FormData(form);
         const hostName = data.get('displayName')?.toString();
@@ -39,6 +41,8 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
         const responseData = await response.json() as LobbyDto;
 
         console.log(responseData); //debugging
+
+        submitButton.removeAttribute('loading');
     })
 }
 
