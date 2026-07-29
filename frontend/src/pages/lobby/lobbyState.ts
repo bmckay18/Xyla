@@ -1,7 +1,6 @@
 export interface LobbyState {
     players: Player[];
     hostId: string;
-    currentPlayerId: string;
 }
 
 export interface Player {
@@ -10,7 +9,13 @@ export interface Player {
 }
 
 function isHost(state: LobbyState): boolean {
-    return state.currentPlayerId === state.hostId;
+    const playerId = sessionStorage.getItem('playerId');
+
+    if (!playerId) {
+        throw new Error('Player ID does not exist.');
+    }
+
+    return playerId === state.hostId;
 }
 
 export function renderPlayers(state: LobbyState): void {

@@ -5,6 +5,6 @@ namespace Backend.Services.Lobbies
     public interface ILobbyService
     {
         LobbyDto CreateLobby(string host, string? password);
-        LobbyDto? GetLobby(Guid id);
+        LobbyDetailsDto? GetLobby(Guid id);
     }
 }

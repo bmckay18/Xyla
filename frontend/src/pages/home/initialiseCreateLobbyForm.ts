@@ -56,11 +56,9 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
             submitButton.removeAttribute('loading');
         }
 
-        sessionStorage.setItem("lobbyId", responseData.id);
-        sessionStorage.setItem("hostId", responseData.host.id);
-        sessionStorage.setItem("currentPlayerId", responseData.currentPlayer.id);
+        sessionStorage.setItem("playerId", responseData.playerId);
 
-        window.location.href = '/lobby.html';
+        window.location.href = `/lobby.html?lobbyId=${responseData.lobbyId}`;
     })
 }
 
@@ -83,18 +81,11 @@ async function makeCreateLobbyRequest(data: CreateLobbyRequest): Promise<Respons
 }
 
 interface CreateLobbyRequest {
-    hostName: string,
-    password: string | null
+    hostName: string;
+    password: string | null;
 }
 
 interface LobbyDto {
-    id: string,
-    host: Player,
-    players: Player[],
-    currentPlayer: Player
-}
-
-interface Player {
-    id: string,
-    name: string
+    lobbyId: string;
+    playerId: string;
 }

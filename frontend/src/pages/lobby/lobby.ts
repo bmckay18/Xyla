@@ -1,22 +1,19 @@
 import { startImposters } from "../../games/imposters/imposters";
+import { initialiseLobbyState } from "./initialiseLobbyState";
 import { renderPlayers } from "./lobbyState";
 import type { LobbyState } from "./lobbyState";
 
-const mockLobbyState: LobbyState = {
-    players: [
-        {
-            id: "1",
-            name: "James"
-        },
-        {
-            id: "4",
-            name: "John"
-        }
-    ],
-    hostId: "4",
-    currentPlayerId: "4"
+let lobbyState: LobbyState;
+
+const params = new URLSearchParams(window.location.search);
+const lobbyId = params.get("lobbyId");
+
+if (!lobbyId) {
+    throw new Error('No lobby ID provided.');
 }
 
-renderPlayers(mockLobbyState);
+lobbyState = await initialiseLobbyState(lobbyId);
+
+renderPlayers(lobbyState);
 
 startImposters();

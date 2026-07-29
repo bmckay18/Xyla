@@ -7,7 +7,13 @@ namespace Backend.Mapping
     {
         public LobbyMappingProfile()
         {
-            CreateMap<Lobby, LobbyDto>();
+            CreateMap<Lobby, LobbyDetailsDto>()
+                .ForMember(
+                    dest => dest.HostId,
+                    opt => opt.MapFrom(src => src.Host.Id))
+                .ForMember(
+                    dest => dest.Players,
+                    opt => opt.MapFrom(src => src.Players));
         }
     }
 }

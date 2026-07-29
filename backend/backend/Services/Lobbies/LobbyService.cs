@@ -33,13 +33,14 @@ namespace Backend.Services.Lobbies
 
             _lobbies.Add(lobby);
 
-            var lobbyDto = _mapper.Map<LobbyDto>(lobby);
-            lobbyDto.CurrentPlayer = player;
-
-            return lobbyDto;
+            return new LobbyDto
+            {
+                LobbyId = lobby.Id,
+                PlayerId = player.Id
+            };
         }
 
-        public LobbyDto? GetLobby(Guid id)
+        public LobbyDetailsDto? GetLobby(Guid id)
         {
             var lobby = _lobbies.FirstOrDefault(x => x.Id == id);
 
@@ -48,7 +49,7 @@ namespace Backend.Services.Lobbies
                 return null;
             }
 
-            return _mapper.Map<LobbyDto>(lobby);
+            return _mapper.Map<LobbyDetailsDto>(lobby);
         }
 
         private static PasswordDetails GenerateLobbyPassword(string password)

@@ -26,7 +26,7 @@ namespace Backend.Controllers
 
         [HttpGet]
         [Route("{lobbyId}")]
-        public IActionResult GetLobby(Guid lobbyId)
+        public ActionResult<LobbyDetailsDto> GetLobby(Guid lobbyId)
         {
             var lobby = _lobbyService.GetLobby(lobbyId);
 
