@@ -9,27 +9,29 @@
 
     <link rel="stylesheet" href="./src/style.css" />
     <link rel="stylesheet" href="./src/pages/home/home-styles.css" />
+
+    <title>Xyla</title>
   </head>
   <body>
     <div class="header">
-      <a href="./src/pages/lobby/lobby.html">Home</a>
+      <a href="lobby.html">Home</a>
     </div>
 
     <div class="lobby-selection">
       <h1>Create A Lobby</h1>
       <form id="create-lobby-form">
-        <wa-input name="displayName" label="Display Name"></wa-input>
-        <wa-input name="password" label="Password" hint="Leave blank for no password"></wa-input>
+        <wa-input name="displayName" label="Display Name" required></wa-input>
+        <wa-input name="password" label="Password" hint="Leave blank for no password" type="password"></wa-input>
 
-        <wa-button variant="success" type="submit">Create Lobby</wa-button>
+        <wa-button variant="success" type="submit" id="create-lobby-button">Create Lobby</wa-button>
       </form>
 
       <h1>Join A Lobby</h1>
 
       <form id="join-lobby-form">
-        <wa-input name="displayName" label="Display Name"></wa-input>
-        <wa-input name="lobbyId" label="Lobby ID"></wa-input>
-        <wa-input name="password" label="Password"></wa-input>
+        <wa-input name="displayName" label="Display Name" required></wa-input>
+        <wa-input name="lobbyId" label="Lobby ID" required></wa-input>
+        <wa-input name="password" label="Password" type="password"></wa-input>
 
         <wa-button variant="success" type="submit">Join Lobby</wa-button>
       </form>

@@ -17,16 +17,16 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Lobby> CreateLobby(CreateLobbyRequest request)
+        public ActionResult<LobbyDto> CreateLobby(CreateLobbyRequest request)
         {
-            var lobby = _lobbyService.CreateLobby(request.HostName);
+            var lobby = _lobbyService.CreateLobby(request.HostName, request.Password);
 
             return Ok(lobby);
         }
 
         [HttpGet]
         [Route("{lobbyId}")]
-        public IActionResult GetLobby(Guid lobbyId)
+        public ActionResult<LobbyDetailsDto> GetLobby(Guid lobbyId)
         {
             var lobby = _lobbyService.GetLobby(lobbyId);
 
