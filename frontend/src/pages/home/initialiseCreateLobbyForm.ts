@@ -18,7 +18,9 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
         const password = data.get('password')?.toString();
 
         if (!hostName) {
-            throw new Error('Display name is required.');
+            console.error('Display name is required.');
+            submitButton.removeAttribute('loading');
+            return;
         }
 
         const requestBody: CreateLobbyRequest = {
@@ -26,30 +28,58 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
             password: password || null
         };
 
-        const response = await fetch(`${appSettings.baseUrl}/api/lobbies`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(requestBody)
-        });
+        let response: Response | null;
 
-        if (!response.ok) {
-            throw new Error(`Error: ${response.status}`);
+        response = await makeCreateLobbyRequest(requestBody);
+
+        if (!response) {
+            submitButton.removeAttribute('loading');
+            return;
         }
 
-        const responseData = await response.json() as LobbyDto;
+        if (!response.ok) {
+            console.error(`Error: ${response.status}`);
+            submitButton.removeAttribute('loading');
+            return;
+        }
 
-        console.log(responseData);
+        let responseData: LobbyDto;
+
+        try {
+            responseData = await response.json() as LobbyDto;
+        }
+        catch (exception) {
+            console.error(`Error: ${exception}`);
+            return;
+        }
+        finally {
+            submitButton.removeAttribute('loading');
+        }
 
         sessionStorage.setItem("lobbyId", responseData.id);
         sessionStorage.setItem("hostId", responseData.host.id);
         sessionStorage.setItem("currentPlayerId", responseData.currentPlayer.id);
 
         window.location.href = '/lobby.html';
-
-        submitButton.removeAttribute('loading');
     })
+}
+
+async function makeCreateLobbyRequest(data: CreateLobbyRequest): Promise<Response | null> {
+    try {
+        const response = await fetch(`${appSettings.baseUrl}/api/lobbies`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+        return response;
+    }
+    catch(exception) {
+        console.error(`Error: ${exception}`);
+        return null;
+    }
 }
 
 interface CreateLobbyRequest {
