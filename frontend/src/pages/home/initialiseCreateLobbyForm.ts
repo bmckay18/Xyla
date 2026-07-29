@@ -38,7 +38,7 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
         }
 
         if (!response.ok) {
-            console.error(`Error: ${response.status}`);
+            console.error(`${response.status}`);
             submitButton.removeAttribute('loading');
             return;
         }
@@ -49,7 +49,7 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
             responseData = await response.json() as LobbyDto;
         }
         catch (exception) {
-            console.error(`Error: ${exception}`);
+            console.error(`${exception}`);
             return;
         }
         finally {
@@ -75,7 +75,7 @@ async function makeCreateLobbyRequest(data: CreateLobbyRequest): Promise<Respons
         return response;
     }
     catch(exception) {
-        console.error(`Error: ${exception}`);
+        console.error(`${exception}`);
         return null;
     }
 }
