@@ -40,7 +40,13 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
 
         const responseData = await response.json() as LobbyDto;
 
-        console.log(responseData); //debugging
+        console.log(responseData);
+
+        sessionStorage.setItem("lobbyId", responseData.id);
+        sessionStorage.setItem("hostId", responseData.host.id);
+        sessionStorage.setItem("currentPlayerId", responseData.currentPlayer.id);
+
+        window.location.href = '/lobby.html';
 
         submitButton.removeAttribute('loading');
     })
@@ -52,12 +58,13 @@ interface CreateLobbyRequest {
 }
 
 interface LobbyDto {
-    Id: string,
-    Host: Player,
-    Players: Player[]
+    id: string,
+    host: Player,
+    players: Player[],
+    currentPlayer: Player
 }
 
 interface Player {
-    Id: string,
-    Name: string
+    id: string,
+    name: string
 }

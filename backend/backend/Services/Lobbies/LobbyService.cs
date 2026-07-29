@@ -33,7 +33,10 @@ namespace Backend.Services.Lobbies
 
             _lobbies.Add(lobby);
 
-            return _mapper.Map<LobbyDto>(lobby);
+            var lobbyDto = _mapper.Map<LobbyDto>(lobby);
+            lobbyDto.CurrentPlayer = player;
+
+            return lobbyDto;
         }
 
         public LobbyDto? GetLobby(Guid id)
