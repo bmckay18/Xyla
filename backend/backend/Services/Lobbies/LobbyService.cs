@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Backend.CustomExceptions;
 using Backend.Services.Lobbies.Models;
 
 namespace Backend.Services.Lobbies
@@ -40,9 +41,9 @@ namespace Backend.Services.Lobbies
             };
         }
 
-        public LobbyDetailsDto? GetLobby(Guid id)
+        public LobbyDetailsDto? GetLobby(Guid lobbyId, Guid playerId)
         {
-            var lobby = _lobbies.FirstOrDefault(x => x.Id == id);
+            var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId && x.Players.Any(p => p.Id == playerId));
 
             if (lobby is null)
             {
@@ -50,6 +51,56 @@ namespace Backend.Services.Lobbies
             }
 
             return _mapper.Map<LobbyDetailsDto>(lobby);
+        }
+
+        public LobbyDto? JoinLobby(string displayName, Guid lobbyId, string? password)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
+
+            if (lobby is null)
+            {
+                return null;
+            }
+
+            var existingUsername = lobby.Players.Any(p => p.Name == displayName);
+
+            if (existingUsername)
+            {
+                throw new BadRequestException("Display name must be unique.");
+            }
+
+            if (lobby.PasswordDetails is not null)
+            {
+                if (password is null)
+                {
+                    throw new BadRequestException("Invalid password");
+                }
+
+                var isCorrectPassword = LobbyPasswordService.ValidatePassword(password, lobby.PasswordDetails.Password, lobby.PasswordDetails.Salt);
+
+                if (!isCorrectPassword)
+                {
+                    throw new UnauthorisedException("Invalid password");
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(displayName))
+            {
+                return null;
+            }
+
+            var player = new Player
+            {
+                Name = displayName
+            };
+
+            lobby.Players.Add(player);
+
+            return new LobbyDto
+            {
+                LobbyId = lobby.Id,
+                PlayerId = player.Id
+            };
         }
 
         private static PasswordDetails GenerateLobbyPassword(string password)

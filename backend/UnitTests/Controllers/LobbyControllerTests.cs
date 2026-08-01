@@ -4,9 +4,6 @@ using Backend.Services.Lobbies;
 using Backend.Services.Lobbies.Models;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace UnitTests.Controllers
 {
@@ -41,19 +38,22 @@ namespace UnitTests.Controllers
         public void GetLobby_ReturnsOkResult_WhenLobbyExists()
         {
             var lobbyId = Guid.NewGuid();
+
+            var mockPlayer = new Player { Name = "User1" };
+
             var mockResult = new LobbyDetailsDto
             {
                 HostId = "1",
-                Players = new List<Player> { new Player { Name = "User1" } }
-            };
+                Players = new List<Player> { mockPlayer }
+            }; 
 
-            _lobbyServiceMock.Setup(r => r.GetLobby(It.IsAny<Guid>())).Returns(mockResult);
+            _lobbyServiceMock.Setup(r => r.GetLobby(It.Is<Guid>(g => g == lobbyId), It.Is<Guid>(g => g == mockPlayer.Id))).Returns(mockResult);
 
-            var result = _controller.GetLobby(lobbyId);
+            var result = _controller.GetLobby(lobbyId, mockPlayer.Id);
             var okResult = result.Result as OkObjectResult;
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
-            _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>()), Times.Once);
+            _lobbyServiceMock.Verify(r => r.GetLobby(It.Is<Guid>(g => g == lobbyId), It.Is<Guid>(g => g == mockPlayer.Id)), Times.Once);
             Assert.That(okResult!.Value, Is.EqualTo(mockResult));
         }
 
@@ -62,12 +62,12 @@ namespace UnitTests.Controllers
         {
             var lobbyId = Guid.NewGuid();
 
-            _lobbyServiceMock.Setup(r => r.GetLobby(It.IsAny<Guid>())).Returns((LobbyDetailsDto?)null);
+            _lobbyServiceMock.Setup(r => r.GetLobby(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns((LobbyDetailsDto?)null);
 
-            var result = _controller.GetLobby(lobbyId);
+            var result = _controller.GetLobby(lobbyId, Guid.Empty);
 
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-            _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>()), Times.Once);
+            _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
         }        
     }
 }

@@ -43,7 +43,7 @@ namespace UnitTests.Services
             var hostName = "user3";
 
             var lobby = _service.CreateLobby(hostName, null);
-            var retrievedLobby = _service.GetLobby(lobby.LobbyId);
+            var retrievedLobby = _service.GetLobby(lobby.LobbyId, lobby.PlayerId);
 
             Assert.That(lobby, Is.Not.Null);
             Assert.That(retrievedLobby, Is.Not.Null);

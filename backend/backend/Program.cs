@@ -1,6 +1,8 @@
+using Backend.CustomExceptions;
 using Backend.Hubs;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,34 @@ builder.Services.AddAutoMapper(cfg =>
 
 // Build app
 var app = builder.Build();
+
+app.UseExceptionHandler(appError =>
+{
+    appError.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+        context.Response.ContentType = "text/plain";
+
+        if (exception is UnauthorisedException)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync(exception.Message);
+            return;
+        }
+        else if (exception is BadRequestException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync(exception.Message);
+            return;
+        }
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsync(exception?.Message ?? "An internal server error occurred");
+        return;
+
+    });
+});
 
 app.UseCors("Frontend");
 

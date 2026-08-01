@@ -25,10 +25,24 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Route("{lobbyId}")]
-        public ActionResult<LobbyDetailsDto> GetLobby(Guid lobbyId)
+        [Route("{lobbyId}/{playerId}")]
+        public ActionResult<LobbyDetailsDto> GetLobby(Guid lobbyId, Guid playerId)
         {
-            var lobby = _lobbyService.GetLobby(lobbyId);
+            var lobby = _lobbyService.GetLobby(lobbyId, playerId);
+
+            if (lobby is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(lobby);
+        }
+
+        [HttpPost]
+        [Route("join")]
+        public ActionResult<LobbyDto> JoinLobby(JoinLobbyRequest request)
+        {
+            var lobby = _lobbyService.JoinLobby(request.DisplayName, request.LobbyId, request.Password);
 
             if (lobby is null)
             {

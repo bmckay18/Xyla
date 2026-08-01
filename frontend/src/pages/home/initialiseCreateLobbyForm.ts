@@ -38,8 +38,11 @@ export async function initialiseCreateLobbyForm(): Promise<void> {
         }
 
         if (!response.ok) {
-            console.error(`${response.status}`);
+            const message = await response.text();
+
+            console.error(`Error ${response.status}: ${message}`);
             submitButton.removeAttribute('loading');
+            alert(message);
             return;
         }
 
@@ -85,7 +88,7 @@ interface CreateLobbyRequest {
     password: string | null;
 }
 
-interface LobbyDto {
+export interface LobbyDto {
     lobbyId: string;
     playerId: string;
 }
