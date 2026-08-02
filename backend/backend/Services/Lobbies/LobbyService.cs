@@ -71,12 +71,7 @@ namespace Backend.Services.Lobbies
 
             if (lobby.PasswordDetails is not null)
             {
-                if (password is null)
-                {
-                    throw new BadRequestException("Invalid password");
-                }
-
-                var isCorrectPassword = LobbyPasswordService.ValidatePassword(password, lobby.PasswordDetails.Password, lobby.PasswordDetails.Salt);
+                var isCorrectPassword = LobbyPasswordService.ValidatePassword(password ?? string.Empty, lobby.PasswordDetails.Password, lobby.PasswordDetails.Salt);
 
                 if (!isCorrectPassword)
                 {

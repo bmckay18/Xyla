@@ -68,6 +68,49 @@ namespace UnitTests.Controllers
 
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
             _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
-        }        
+        }
+
+        [Test]
+        public void JoinLobby_CallsLobbyService_WithValidData()
+        {
+            var lobbyId = Guid.NewGuid();
+            var playerId = Guid.NewGuid();
+
+            var lobbyDto = new LobbyDto
+            {
+                LobbyId = lobbyId,
+                PlayerId = playerId
+            };
+
+            var request = new JoinLobbyRequest
+            {
+                DisplayName = "test",
+                LobbyId = lobbyId,
+                Password = "test123"
+            };
+
+            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).Returns(lobbyDto);
+
+            var result = _controller.JoinLobby(request);
+
+            Assert.That(result, Is.Not.Null);
+            _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>()), Times.Once);
+        }
+
+        [Test]
+        public void JoinLobby_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
+        {
+            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).Returns((LobbyDto?)null);
+
+            var result = _controller.JoinLobby(new JoinLobbyRequest
+            {
+                DisplayName = "test",
+                LobbyId = Guid.NewGuid(),
+                Password = "test"
+            });
+
+            Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
+            _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+        }
     }
 }
