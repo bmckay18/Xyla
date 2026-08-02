@@ -87,14 +87,14 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public void JoinLobby_ThrowsUnauthorisedException_WhenWrongPasswordSupplied()
+        public void JoinLobby_ThrowsBadRequestException_WhenWrongPasswordSupplied()
         {
             var userName = "user 123";
             var password = "abc123";
 
             var lobby = _service.CreateLobby(userName, password);
 
-            Assert.Throws<UnauthorisedException>(() =>
+            Assert.Throws<BadRequestException>(() =>
             {
                 _service.JoinLobby("joined user", lobby.LobbyId, "an invalid password");
             });
