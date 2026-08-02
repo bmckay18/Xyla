@@ -57,16 +57,44 @@ namespace Backend.Services.Lobbies
         {
             var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
 
-            if (lobby is null)
+            var canJoinLobby = CanJoinLobby(displayName, lobbyId, password);
+
+            if (!canJoinLobby.Status)
             {
-                return null;
+                throw new BadRequestException(canJoinLobby.Message ?? "An error occurred.");
             }
 
-            var existingUsername = lobby.Players.Any(p => p.Name == displayName);
-
-            if (existingUsername)
+            var player = new Player
             {
-                throw new BadRequestException("Display name must be unique.");
+                Name = displayName
+            };
+
+            lobby!.Players.Add(player);
+
+            return new LobbyDto
+            {
+                LobbyId = lobby.Id,
+                PlayerId = player.Id
+            };
+        }
+
+        private CanJoinLobbyDetails CanJoinLobby(string name, Guid lobbyId, string? password)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
+
+            if (lobby is null)
+            {
+                return new CanJoinLobbyDetails(false, "The lobby does not exist.");
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return new CanJoinLobbyDetails(false, "Your display name cannot be empty");
+            }
+
+            if (lobby.Players.Any(p => p.Name == name))
+            {
+                return new CanJoinLobbyDetails(false, "Your display name must be unique");
             }
 
             if (lobby.PasswordDetails is not null)
@@ -75,27 +103,11 @@ namespace Backend.Services.Lobbies
 
                 if (!isCorrectPassword)
                 {
-                    throw new UnauthorisedException("Invalid password");
+                    return new CanJoinLobbyDetails(false, "Invalid password.");
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(displayName))
-            {
-                return null;
-            }
-
-            var player = new Player
-            {
-                Name = displayName
-            };
-
-            lobby.Players.Add(player);
-
-            return new LobbyDto
-            {
-                LobbyId = lobby.Id,
-                PlayerId = player.Id
-            };
+            return new CanJoinLobbyDetails(true, null);
         }
 
         private static PasswordDetails GenerateLobbyPassword(string password)
