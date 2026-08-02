@@ -1,11 +1,11 @@
 import type { LobbyState, Player } from "./lobbyState";
 import { appSettings } from "../../config";
 
-export async function fetchLobbyState(lobbyId: string): Promise<LobbyState> {
+export async function fetchLobbyState(lobbyId: string, playerId: string): Promise<LobbyState> {
     let response: Response;
 
     try {
-        response = await fetch(`${appSettings.baseUrl}/api/lobbies/${lobbyId}`);
+        response = await fetch(`${appSettings.baseUrl}/api/lobbies/${lobbyId}/${playerId}`);
 
         if (!response.ok) {
             throw new Error(`${response.status}`);
