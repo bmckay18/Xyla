@@ -31,7 +31,6 @@ startImposters();
 
 function setupSignalRNotifications(): void {
     connection.on("PlayerJoined", (player: Player) => {
-        
         const playerAlreadyExists = lobbyState.players.some(p => p.id === player.id);
 
         if (playerAlreadyExists) {
@@ -40,5 +39,14 @@ function setupSignalRNotifications(): void {
         
         lobbyState.players.push(player);
         renderPlayers(lobbyState);
-    })
+    });
+
+    connection.on("PlayerLeft", (player: Player) => {
+        const index = lobbyState.players.findIndex(x => x.id === player.id);
+
+        if (index !== -1) {
+            lobbyState.players.splice(index, 1);
+            renderPlayers(lobbyState);
+        }
+    });
 }

@@ -108,18 +108,21 @@ namespace Backend.Services.Lobbies
             };
         }
 
-        public bool IsInLobby(Guid playerId, Guid lobbyId)
+        public async Task LeaveLobby(Guid playerId)
         {
-            var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
+            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
 
             if (lobby is null)
             {
-                return false;
+                return;
             }
 
-            var isPlayerInLobby = lobby.Players.Any(x => x.Id == playerId);
+            var player = lobby.Players.First(x => x.Id == playerId);
 
-            return isPlayerInLobby;
+            lobby.Players.Remove(player);
+
+            await _hub.Clients.Group(lobby.Id.ToString())
+                .SendAsync("PlayerLeft", player);
         }
 
         private CanJoinLobbyDetails CanJoinLobby(string name, Guid lobbyId, string? password)

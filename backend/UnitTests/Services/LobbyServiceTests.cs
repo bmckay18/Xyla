@@ -131,5 +131,25 @@ namespace UnitTests.Services
                 _service.JoinLobby(userName, lobby.LobbyId, null);
             });
         }
+
+        [Test]
+        public async Task GetLobbyId_ReturnsLobbyId_ForValidPlayer()
+        {
+            var userName = "user 123";
+
+            var lobby = _service.CreateLobby(userName, null);
+
+            var lobbyId = _service.GetLobbyId(lobby.PlayerId);
+
+            Assert.That(lobbyId, Is.EqualTo(lobby.LobbyId));
+        }
+
+        [Test]
+        public async Task GetLobbyId_ReturnsNull_WhenPlayerNotLinkedToALobby()
+        {
+            var lobbyId = _service.GetLobbyId(Guid.Empty);
+
+            Assert.That(lobbyId, Is.Null);
+        }
     }
 }

@@ -35,5 +35,19 @@ namespace Backend.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId);
         }
+
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            var playerId = Context.UserIdentifier;
+
+            if (!Guid.TryParse(playerId, out Guid id))
+            {
+                await base.OnDisconnectedAsync(exception);
+                return;
+            }
+
+            await _lobbyService.LeaveLobby(id);
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }
