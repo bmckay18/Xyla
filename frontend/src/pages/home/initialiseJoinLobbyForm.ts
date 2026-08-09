@@ -69,6 +69,7 @@ export async function initialiseJoinLobbyForm(): Promise<void> {
         }
 
         sessionStorage.setItem("playerId", responseData.playerId);
+        sessionStorage.setItem("authToken", responseData.jwt);
         window.location.href = `/lobby.html?lobbyId=${responseData.lobbyId}`;
     });
 }

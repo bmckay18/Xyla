@@ -1,16 +1,25 @@
 ﻿using AutoMapper;
 using Backend.CustomExceptions;
+using Backend.Hubs;
 using Backend.Services.Lobbies.Models;
+using Backend.Services.Token;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Backend.Services.Lobbies
 {
     public class LobbyService : ILobbyService
     {
         private readonly IMapper _mapper;
-        private readonly List<Lobby> _lobbies = new();    
-        public LobbyService(IMapper mapper)
+        private readonly IHubContext<GameHub> _hub;
+        private readonly ITokenService _tokenService;
+
+        private readonly List<Lobby> _lobbies = new();
+
+        public LobbyService(IMapper mapper, IHubContext<GameHub> hub, ITokenService tokenService)
         {
             _mapper = mapper;
+            _hub = hub;
+            _tokenService = tokenService;
         }
 
         public LobbyDto CreateLobby(string hostName, string? password)
@@ -34,10 +43,13 @@ namespace Backend.Services.Lobbies
 
             _lobbies.Add(lobby);
 
+            var jwt = _tokenService.GenerateToken(player.Id);
+
             return new LobbyDto
             {
                 LobbyId = lobby.Id,
-                PlayerId = player.Id
+                PlayerId = player.Id,
+                Jwt = jwt
             };
         }
 
@@ -53,7 +65,19 @@ namespace Backend.Services.Lobbies
             return _mapper.Map<LobbyDetailsDto>(lobby);
         }
 
-        public LobbyDto? JoinLobby(string displayName, Guid lobbyId, string? password)
+        public Guid? GetLobbyId(Guid playerId)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
+
+            if (lobby is null)
+            {
+                return null;
+            }
+
+            return lobby.Id;
+        }
+
+        public async Task<LobbyDto?> JoinLobby(string displayName, Guid lobbyId, string? password)
         {
             var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
 
@@ -71,11 +95,31 @@ namespace Backend.Services.Lobbies
 
             lobby!.Players.Add(player);
 
+            var jwt = _tokenService.GenerateToken(player.Id);
+
+            await _hub.Clients.Group(lobbyId.ToString())
+                .SendAsync("PlayerJoined", player);
+
             return new LobbyDto
             {
                 LobbyId = lobby.Id,
-                PlayerId = player.Id
+                PlayerId = player.Id,
+                Jwt = jwt
             };
+        }
+
+        public bool IsInLobby(Guid playerId, Guid lobbyId)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
+
+            if (lobby is null)
+            {
+                return false;
+            }
+
+            var isPlayerInLobby = lobby.Players.Any(x => x.Id == playerId);
+
+            return isPlayerInLobby;
         }
 
         private CanJoinLobbyDetails CanJoinLobby(string name, Guid lobbyId, string? password)

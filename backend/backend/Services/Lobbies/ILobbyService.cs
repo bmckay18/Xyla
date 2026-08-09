@@ -6,6 +6,7 @@ namespace Backend.Services.Lobbies
     {
         LobbyDto CreateLobby(string host, string? password);
         LobbyDetailsDto? GetLobby(Guid lobbyId, Guid playerId);
-        LobbyDto? JoinLobby(string displayName, Guid lobbyId, string? password);
+        Guid? GetLobbyId(Guid playerId);
+        Task<LobbyDto?> JoinLobby(string displayName, Guid lobbyId, string? password);
     }
 }

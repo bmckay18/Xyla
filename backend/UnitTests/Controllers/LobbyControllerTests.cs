@@ -71,7 +71,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public void JoinLobby_CallsLobbyService_WithValidData()
+        public async Task JoinLobby_CallsLobbyService_WithValidData()
         {
             var lobbyId = Guid.NewGuid();
             var playerId = Guid.NewGuid();
@@ -79,7 +79,8 @@ namespace UnitTests.Controllers
             var lobbyDto = new LobbyDto
             {
                 LobbyId = lobbyId,
-                PlayerId = playerId
+                PlayerId = playerId,
+                Jwt = "test"
             };
 
             var request = new JoinLobbyRequest
@@ -89,20 +90,20 @@ namespace UnitTests.Controllers
                 Password = "test123"
             };
 
-            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).Returns(lobbyDto);
+            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).ReturnsAsync(lobbyDto);
 
-            var result = _controller.JoinLobby(request);
+            var result = await _controller.JoinLobbyAsync(request);
 
             Assert.That(result, Is.Not.Null);
             _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
-        public void JoinLobby_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
+        public async Task JoinLobby_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
         {
-            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).Returns((LobbyDto?)null);
+            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync((LobbyDto?)null);
 
-            var result = _controller.JoinLobby(new JoinLobbyRequest
+            var result = await _controller.JoinLobbyAsync(new JoinLobbyRequest
             {
                 DisplayName = "test",
                 LobbyId = Guid.NewGuid(),

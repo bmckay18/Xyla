@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Backend.CustomExceptions;
+using Backend.Hubs;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
-using Backend.Services.Lobbies.Models;
+using Backend.Services.Token;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json.Bson;
+using Moq;
 
 namespace UnitTests.Services
 {
@@ -13,6 +15,8 @@ namespace UnitTests.Services
     {
         private ILobbyService _service;
         private IMapper _mapper;
+        private Mock<IHubContext<GameHub>> _hubMock;
+        private Mock<ITokenService> _tokenServiceMock;
 
         [SetUp]
         public void Setup()
@@ -23,8 +27,10 @@ namespace UnitTests.Services
             }, NullLoggerFactory.Instance);
 
             _mapper = mapperConfig.CreateMapper();
+            _hubMock = new Mock<IHubContext<GameHub>>();
+            _tokenServiceMock = new Mock<ITokenService>();
 
-            _service = new LobbyService(_mapper);
+            _service = new LobbyService(_mapper, _hubMock.Object, _tokenServiceMock.Object);
         }
 
         [Test]
@@ -56,13 +62,13 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public void JoinLobby_SuccessfullyAddsUser()
+        public async Task JoinLobby_SuccessfullyAddsUser()
         {
             var userName = "user 123";
 
             var lobby = _service.CreateLobby(userName, null);
 
-            var retrievedLobby = _service.JoinLobby("joined user", lobby.LobbyId, null);
+            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, null);
             var newLobbyData = _service.GetLobby(lobby.LobbyId, lobby.PlayerId);
 
             Assert.That(retrievedLobby, Is.Not.Null);
@@ -73,14 +79,14 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public void JoinLobby_AddsUserToLobby_WhenCorrectPasswordProvided()
+        public async Task JoinLobby_AddsUserToLobby_WhenCorrectPasswordProvided()
         {
             var userName = "user 123";
             var password = "abc123";
 
             var lobby = _service.CreateLobby(userName, password);
 
-            var retrievedLobby = _service.JoinLobby("joined user", lobby.LobbyId, password);
+            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, password);
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.PlayerId, Is.Not.EqualTo(Guid.Empty));
@@ -101,13 +107,13 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public void JoinLobby_AddsUserToLobby_WhenPasswordProvidedForNonPasswordLobby()
+        public async Task JoinLobby_AddsUserToLobby_WhenPasswordProvidedForNonPasswordLobby()
         {
             var userName = "user 123";
 
             var lobby = _service.CreateLobby(userName, null);
 
-            var retrievedLobby = _service.JoinLobby("joined user", lobby.LobbyId, "a password");
+            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, "a password");
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.PlayerId, Is.Not.EqualTo(Guid.Empty));

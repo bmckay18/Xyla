@@ -40,9 +40,9 @@ namespace Backend.Controllers
 
         [HttpPost]
         [Route("join")]
-        public ActionResult<LobbyDto> JoinLobby(JoinLobbyRequest request)
+        public async Task<ActionResult<LobbyDto>> JoinLobbyAsync(JoinLobbyRequest request)
         {
-            var lobby = _lobbyService.JoinLobby(request.DisplayName, request.LobbyId, request.Password);
+            var lobby = await _lobbyService.JoinLobby(request.DisplayName, request.LobbyId, request.Password);
 
             if (lobby is null)
             {

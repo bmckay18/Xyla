@@ -2,7 +2,11 @@ using Backend.CustomExceptions;
 using Backend.Hubs;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
+using Backend.Services.Token;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +17,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -29,6 +34,48 @@ builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<LobbyMappingProfile>();
 });
+
+// Setup JWT auth
+var jwtKey = builder.Configuration["Jwt:Key"]!;
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
+            ValidateLifetime = true
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/gameHub"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<ITokenService, TokenService>();
 
 // Build app
 var app = builder.Build();
@@ -65,9 +112,11 @@ app.UseCors("Frontend");
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<GameHub>("/gameHub");
+app.MapHub<GameHub>("/gameHub")
+    .RequireAuthorization();
 
 app.Run();
