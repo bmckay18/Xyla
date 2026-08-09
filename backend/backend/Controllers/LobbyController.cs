@@ -1,7 +1,9 @@
 ﻿using Backend.Controllers.Models;
 using Backend.Services.Lobbies;
 using Backend.Services.Lobbies.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Backend.Controllers
 {
@@ -25,10 +27,17 @@ namespace Backend.Controllers
         }
 
         [HttpGet]
-        [Route("{lobbyId}/{playerId}")]
-        public ActionResult<LobbyDetailsDto> GetLobby(Guid lobbyId, Guid playerId)
+        [Authorize]
+        public ActionResult<LobbyDetailsDto> GetLobby()
         {
-            var lobby = _lobbyService.GetLobby(lobbyId, playerId);
+            var playerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(playerIdClaim, out var playerId))
+            {
+                return Unauthorized();
+            }
+
+            var lobby = _lobbyService.GetLobby(playerId);
 
             if (lobby is null)
             {

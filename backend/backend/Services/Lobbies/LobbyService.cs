@@ -53,9 +53,9 @@ namespace Backend.Services.Lobbies
             };
         }
 
-        public LobbyDetailsDto? GetLobby(Guid lobbyId, Guid playerId)
+        public LobbyDetailsDto? GetLobby(Guid playerId)
         {
-            var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId && x.Players.Any(p => p.Id == playerId));
+            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
 
             if (lobby is null)
             {

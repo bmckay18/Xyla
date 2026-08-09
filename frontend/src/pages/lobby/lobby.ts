@@ -23,7 +23,7 @@ await startSignalR();
 await connection.invoke('JoinLobby');
 
 
-lobbyState = await fetchLobbyState(lobbyId, playerId);
+lobbyState = await fetchLobbyState();
 
 renderPlayers(lobbyState);
 
