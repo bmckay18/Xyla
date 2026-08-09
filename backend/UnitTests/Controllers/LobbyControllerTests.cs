@@ -49,7 +49,7 @@ namespace UnitTests.Controllers
 
             _lobbyServiceMock.Setup(r => r.GetLobby(It.Is<Guid>(g => g == mockPlayer.Id))).Returns(mockResult);
 
-            var result = _controller.GetLobby(mockPlayer.Id);
+            var result = _controller.GetLobby();
             var okResult = result.Result as OkObjectResult;
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
@@ -64,7 +64,7 @@ namespace UnitTests.Controllers
 
             _lobbyServiceMock.Setup(r => r.GetLobby(It.IsAny<Guid>())).Returns((LobbyDetailsDto?)null);
 
-            var result = _controller.GetLobby(Guid.Empty);
+            var result = _controller.GetLobby();
 
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
             _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>()), Times.Once);

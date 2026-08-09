@@ -2,6 +2,7 @@
 using Backend.CustomExceptions;
 using Backend.Hubs;
 using Backend.Services.Lobbies.Models;
+using Backend.Services.Notifier;
 using Backend.Services.Token;
 using Microsoft.AspNetCore.SignalR;
 
@@ -10,16 +11,16 @@ namespace Backend.Services.Lobbies
     public class LobbyService : ILobbyService
     {
         private readonly IMapper _mapper;
-        private readonly IHubContext<GameHub> _hub;
         private readonly ITokenService _tokenService;
+        private readonly INotifierService _notifier;
 
         private readonly List<Lobby> _lobbies = new();
 
-        public LobbyService(IMapper mapper, IHubContext<GameHub> hub, ITokenService tokenService)
+        public LobbyService(IMapper mapper, ITokenService tokenService, INotifierService notifier)
         {
             _mapper = mapper;
-            _hub = hub;
             _tokenService = tokenService;
+            _notifier = notifier;
         }
 
         public LobbyDto CreateLobby(string hostName, string? password)
@@ -97,8 +98,7 @@ namespace Backend.Services.Lobbies
 
             var jwt = _tokenService.GenerateToken(player.Id);
 
-            await _hub.Clients.Group(lobbyId.ToString())
-                .SendAsync("PlayerJoined", player);
+            await _notifier.PlayerJoined(lobbyId, player);
 
             return new LobbyDto
             {
@@ -121,8 +121,7 @@ namespace Backend.Services.Lobbies
 
             lobby.Players.Remove(player);
 
-            await _hub.Clients.Group(lobby.Id.ToString())
-                .SendAsync("PlayerLeft", player);
+            await _notifier.PlayerLeft(lobby.Id, player);
         }
 
         private CanJoinLobbyDetails CanJoinLobby(string name, Guid lobbyId, string? password)

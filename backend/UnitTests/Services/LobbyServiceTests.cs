@@ -3,6 +3,7 @@ using Backend.CustomExceptions;
 using Backend.Hubs;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
+using Backend.Services.Notifier;
 using Backend.Services.Token;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -15,8 +16,8 @@ namespace UnitTests.Services
     {
         private ILobbyService _service;
         private IMapper _mapper;
-        private Mock<IHubContext<GameHub>> _hubMock;
         private Mock<ITokenService> _tokenServiceMock;
+        private Mock<INotifierService> _notifierServiceMock;
 
         [SetUp]
         public void Setup()
@@ -27,10 +28,10 @@ namespace UnitTests.Services
             }, NullLoggerFactory.Instance);
 
             _mapper = mapperConfig.CreateMapper();
-            _hubMock = new Mock<IHubContext<GameHub>>();
             _tokenServiceMock = new Mock<ITokenService>();
+            _notifierServiceMock = new Mock<INotifierService>();
 
-            _service = new LobbyService(_mapper, _hubMock.Object, _tokenServiceMock.Object);
+            _service = new LobbyService(_mapper, _tokenServiceMock.Object, _notifierServiceMock.Object);
         }
 
         [Test]
@@ -100,9 +101,9 @@ namespace UnitTests.Services
 
             var lobby = _service.CreateLobby(userName, password);
 
-            Assert.Throws<BadRequestException>(() =>
+            Assert.ThrowsAsync<BadRequestException>(async () =>
             {
-                _service.JoinLobby("joined user", lobby.LobbyId, "an invalid password");
+                await _service.JoinLobby("joined user", lobby.LobbyId, "an invalid password");
             });
         }
 
@@ -126,9 +127,9 @@ namespace UnitTests.Services
 
             var lobby = _service.CreateLobby(userName, null);
 
-            Assert.Throws<BadRequestException>(() =>
+            Assert.ThrowsAsync<BadRequestException>(async () =>
             {
-                _service.JoinLobby(userName, lobby.LobbyId, null);
+                await _service.JoinLobby(userName, lobby.LobbyId, null);
             });
         }
 
@@ -150,6 +151,21 @@ namespace UnitTests.Services
             var lobbyId = _service.GetLobbyId(Guid.Empty);
 
             Assert.That(lobbyId, Is.Null);
+        }
+
+        [Test]
+        public async Task LeaveLobby_RemovesPlayerFromLobby()
+        {
+            var lobby = _service.CreateLobby("user 123", null);
+
+            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+
+            await _service.LeaveLobby(observedLobby!.PlayerId);
+
+            var newLobbyState = _service.GetLobby(lobby.PlayerId);
+
+            Assert.That(observedLobby, Is.Not.Null);
+            Assert.That(newLobbyState!.Players.Count, Is.EqualTo(1));
         }
     }
 }

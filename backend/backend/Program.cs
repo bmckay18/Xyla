@@ -2,6 +2,7 @@ using Backend.CustomExceptions;
 using Backend.Hubs;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
+using Backend.Services.Notifier;
 using Backend.Services.Token;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
@@ -28,6 +29,7 @@ builder.Services.AddSignalR();
 
 // Define custom services
 builder.Services.AddSingleton<ILobbyService, LobbyService>();
+builder.Services.AddSingleton<INotifierService, NotifierService>();
 
 // Define automapping
 builder.Services.AddAutoMapper(cfg =>
