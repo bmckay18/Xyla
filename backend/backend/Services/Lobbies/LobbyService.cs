@@ -121,6 +121,23 @@ namespace Backend.Services.Lobbies
 
             await _notifier.PlayerLeft(lobby.Id, player);
         }
+        
+        public async Task KickPlayer(Guid hostPlayerId, Guid kickPlayerId)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == hostPlayerId));
+
+            if (lobby is null)
+            {
+                return;
+            }
+
+            if (lobby.Host.Id != hostPlayerId)
+            {
+                throw new ForbiddenException("Only the host can kick players.");
+            }
+
+            await LeaveLobby(kickPlayerId); // After this, need to disconnect kicked player from the hub
+        }
 
         private CanJoinLobbyDetails CanJoinLobby(string name, Guid lobbyId, string? password)
         {

@@ -1,3 +1,5 @@
+import { appSettings } from "../../config";
+
 export interface LobbyState {
     players: Player[];
     hostId: string;
@@ -51,10 +53,33 @@ export function renderPlayers(state: LobbyState): void {
 
             kickButton.textContent = 'Kick';
 
+            kickButton.addEventListener("click", async (e) => {
+                e.preventDefault();
+
+                await kickPlayer(player.id);
+            });
+
             kickButtonCell.appendChild(kickButton);
             row.appendChild(kickButtonCell);
         }     
         
         tbody.appendChild(row);
     });
+}
+
+async function kickPlayer(kickedPlayerId: string): Promise<void> {
+    const jwt = sessionStorage.getItem('authToken');
+    
+    const response = await fetch(`${appSettings.baseUrl}/api/lobbies/kick`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${jwt}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({kickedPlayerId: kickedPlayerId})
+    });
+
+    if (!response.ok) {
+        throw new Error(`${response.status}`);
+    }
 }
