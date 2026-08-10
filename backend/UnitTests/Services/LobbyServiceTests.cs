@@ -2,9 +2,10 @@
 using Backend.CustomExceptions;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
-using Backend.Services.Lobbies.Models;
+using Backend.Services.Notifier;
+using Backend.Services.Token;
 using Microsoft.Extensions.Logging.Abstractions;
-using Newtonsoft.Json.Bson;
+using Moq;
 
 namespace UnitTests.Services
 {
@@ -13,6 +14,8 @@ namespace UnitTests.Services
     {
         private ILobbyService _service;
         private IMapper _mapper;
+        private Mock<ITokenService> _tokenServiceMock;
+        private Mock<INotifierService> _notifierServiceMock;
 
         [SetUp]
         public void Setup()
@@ -23,8 +26,10 @@ namespace UnitTests.Services
             }, NullLoggerFactory.Instance);
 
             _mapper = mapperConfig.CreateMapper();
+            _tokenServiceMock = new Mock<ITokenService>();
+            _notifierServiceMock = new Mock<INotifierService>();
 
-            _service = new LobbyService(_mapper);
+            _service = new LobbyService(_mapper, _tokenServiceMock.Object, _notifierServiceMock.Object);
         }
 
         [Test]
@@ -46,7 +51,7 @@ namespace UnitTests.Services
             var hostName = "user3";
 
             var lobby = _service.CreateLobby(hostName, null);
-            var retrievedLobby = _service.GetLobby(lobby.LobbyId, lobby.PlayerId);
+            var retrievedLobby = _service.GetLobby(lobby.PlayerId);
 
             Assert.That(lobby, Is.Not.Null);
             Assert.That(retrievedLobby, Is.Not.Null);
@@ -56,14 +61,14 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public void JoinLobby_SuccessfullyAddsUser()
+        public async Task JoinLobby_SuccessfullyAddsUser()
         {
             var userName = "user 123";
 
             var lobby = _service.CreateLobby(userName, null);
 
-            var retrievedLobby = _service.JoinLobby("joined user", lobby.LobbyId, null);
-            var newLobbyData = _service.GetLobby(lobby.LobbyId, lobby.PlayerId);
+            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, null);
+            var newLobbyData = _service.GetLobby(lobby.PlayerId);
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.LobbyId, Is.EqualTo(lobby.LobbyId));
@@ -73,14 +78,14 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public void JoinLobby_AddsUserToLobby_WhenCorrectPasswordProvided()
+        public async Task JoinLobby_AddsUserToLobby_WhenCorrectPasswordProvided()
         {
             var userName = "user 123";
             var password = "abc123";
 
             var lobby = _service.CreateLobby(userName, password);
 
-            var retrievedLobby = _service.JoinLobby("joined user", lobby.LobbyId, password);
+            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, password);
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.PlayerId, Is.Not.EqualTo(Guid.Empty));
@@ -94,20 +99,20 @@ namespace UnitTests.Services
 
             var lobby = _service.CreateLobby(userName, password);
 
-            Assert.Throws<BadRequestException>(() =>
+            Assert.ThrowsAsync<BadRequestException>(async () =>
             {
-                _service.JoinLobby("joined user", lobby.LobbyId, "an invalid password");
+                await _service.JoinLobby("joined user", lobby.LobbyId, "an invalid password");
             });
         }
 
         [Test]
-        public void JoinLobby_AddsUserToLobby_WhenPasswordProvidedForNonPasswordLobby()
+        public async Task JoinLobby_AddsUserToLobby_WhenPasswordProvidedForNonPasswordLobby()
         {
             var userName = "user 123";
 
             var lobby = _service.CreateLobby(userName, null);
 
-            var retrievedLobby = _service.JoinLobby("joined user", lobby.LobbyId, "a password");
+            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, "a password");
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.PlayerId, Is.Not.EqualTo(Guid.Empty));
@@ -120,10 +125,45 @@ namespace UnitTests.Services
 
             var lobby = _service.CreateLobby(userName, null);
 
-            Assert.Throws<BadRequestException>(() =>
+            Assert.ThrowsAsync<BadRequestException>(async () =>
             {
-                _service.JoinLobby(userName, lobby.LobbyId, null);
+                await _service.JoinLobby(userName, lobby.LobbyId, null);
             });
+        }
+
+        [Test]
+        public async Task GetLobbyId_ReturnsLobbyId_ForValidPlayer()
+        {
+            var userName = "user 123";
+
+            var lobby = _service.CreateLobby(userName, null);
+
+            var lobbyId = _service.GetLobbyId(lobby.PlayerId);
+
+            Assert.That(lobbyId, Is.EqualTo(lobby.LobbyId));
+        }
+
+        [Test]
+        public async Task GetLobbyId_ReturnsNull_WhenPlayerNotLinkedToALobby()
+        {
+            var lobbyId = _service.GetLobbyId(Guid.Empty);
+
+            Assert.That(lobbyId, Is.Null);
+        }
+
+        [Test]
+        public async Task LeaveLobby_RemovesPlayerFromLobby()
+        {
+            var lobby = _service.CreateLobby("user 123", null);
+
+            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+
+            await _service.LeaveLobby(observedLobby!.PlayerId);
+
+            var newLobbyState = _service.GetLobby(lobby.PlayerId);
+
+            Assert.That(observedLobby, Is.Not.Null);
+            Assert.That(newLobbyState!.Players.Count, Is.EqualTo(1));
         }
     }
 }

@@ -2,8 +2,10 @@
 using Backend.Controllers.Models;
 using Backend.Services.Lobbies;
 using Backend.Services.Lobbies.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Security.Claims;
 
 namespace UnitTests.Controllers
 {
@@ -11,13 +13,30 @@ namespace UnitTests.Controllers
     {
         private Mock<ILobbyService> _lobbyServiceMock;
         private LobbyController _controller;
+        private Guid _playerIdMock;
 
         [SetUp]
         public void Setup()
         {
             _lobbyServiceMock = new Mock<ILobbyService>();
 
-            _controller = new LobbyController(_lobbyServiceMock.Object);
+            _playerIdMock = Guid.NewGuid();
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, _playerIdMock.ToString())
+            }, "mock"));
+
+            _controller = new LobbyController(_lobbyServiceMock.Object)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = user
+                    }
+                }
+            };
         }
 
         [Test]
@@ -45,15 +64,28 @@ namespace UnitTests.Controllers
             {
                 HostId = "1",
                 Players = new List<Player> { mockPlayer }
-            }; 
+            };
 
-            _lobbyServiceMock.Setup(r => r.GetLobby(It.Is<Guid>(g => g == lobbyId), It.Is<Guid>(g => g == mockPlayer.Id))).Returns(mockResult);
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, mockPlayer.Id.ToString())
+            }, "mock"));
 
-            var result = _controller.GetLobby(lobbyId, mockPlayer.Id);
+            _controller.ControllerContext = new ControllerContext
+            {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = user
+                    }
+            };
+
+            _lobbyServiceMock.Setup(r => r.GetLobby(It.Is<Guid>(g => g == mockPlayer.Id))).Returns(mockResult);
+
+            var result = _controller.GetLobby();
             var okResult = result.Result as OkObjectResult;
 
             Assert.That(result.Result, Is.TypeOf<OkObjectResult>());
-            _lobbyServiceMock.Verify(r => r.GetLobby(It.Is<Guid>(g => g == lobbyId), It.Is<Guid>(g => g == mockPlayer.Id)), Times.Once);
+            _lobbyServiceMock.Verify(r => r.GetLobby(It.Is<Guid>(g => g == mockPlayer.Id)), Times.Once);
             Assert.That(okResult!.Value, Is.EqualTo(mockResult));
         }
 
@@ -62,16 +94,16 @@ namespace UnitTests.Controllers
         {
             var lobbyId = Guid.NewGuid();
 
-            _lobbyServiceMock.Setup(r => r.GetLobby(It.IsAny<Guid>(), It.IsAny<Guid>())).Returns((LobbyDetailsDto?)null);
+            _lobbyServiceMock.Setup(r => r.GetLobby(It.IsAny<Guid>())).Returns((LobbyDetailsDto?)null);
 
-            var result = _controller.GetLobby(lobbyId, Guid.Empty);
+            var result = _controller.GetLobby();
 
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-            _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
+            _lobbyServiceMock.Verify(r => r.GetLobby(It.IsAny<Guid>()), Times.Once);
         }
 
         [Test]
-        public void JoinLobby_CallsLobbyService_WithValidData()
+        public async Task JoinLobby_CallsLobbyService_WithValidData()
         {
             var lobbyId = Guid.NewGuid();
             var playerId = Guid.NewGuid();
@@ -79,7 +111,8 @@ namespace UnitTests.Controllers
             var lobbyDto = new LobbyDto
             {
                 LobbyId = lobbyId,
-                PlayerId = playerId
+                PlayerId = playerId,
+                Jwt = "test"
             };
 
             var request = new JoinLobbyRequest
@@ -89,20 +122,20 @@ namespace UnitTests.Controllers
                 Password = "test123"
             };
 
-            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).Returns(lobbyDto);
+            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).ReturnsAsync(lobbyDto);
 
-            var result = _controller.JoinLobby(request);
+            var result = await _controller.JoinLobbyAsync(request);
 
             Assert.That(result, Is.Not.Null);
             _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
-        public void JoinLobby_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
+        public async Task JoinLobby_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
         {
-            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).Returns((LobbyDto?)null);
+            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync((LobbyDto?)null);
 
-            var result = _controller.JoinLobby(new JoinLobbyRequest
+            var result = await _controller.JoinLobbyAsync(new JoinLobbyRequest
             {
                 DisplayName = "test",
                 LobbyId = Guid.NewGuid(),

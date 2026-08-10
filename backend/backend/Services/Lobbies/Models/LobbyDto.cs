@@ -4,5 +4,6 @@
     {
         public Guid LobbyId { get; set; }
         public Guid PlayerId { get; set; }
+        public required string Jwt { get; set; }
     }
 }
