@@ -2,8 +2,10 @@
 using Backend.Controllers.Models;
 using Backend.Services.Lobbies;
 using Backend.Services.Lobbies.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Security.Claims;
 
 namespace UnitTests.Controllers
 {
@@ -11,13 +13,31 @@ namespace UnitTests.Controllers
     {
         private Mock<ILobbyService> _lobbyServiceMock;
         private LobbyController _controller;
+        private ClaimsPrincipal _userMock;
+        private Guid _playerIdMock;
 
         [SetUp]
         public void Setup()
         {
             _lobbyServiceMock = new Mock<ILobbyService>();
 
-            _controller = new LobbyController(_lobbyServiceMock.Object);
+            _playerIdMock = Guid.NewGuid();
+
+            _userMock = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, _playerIdMock.ToString())
+            }, "mock"));
+
+            _controller = new LobbyController(_lobbyServiceMock.Object)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = _userMock
+                    }
+                }
+            };
         }
 
         [Test]
@@ -45,7 +65,20 @@ namespace UnitTests.Controllers
             {
                 HostId = "1",
                 Players = new List<Player> { mockPlayer }
-            }; 
+            };
+
+            _userMock = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, mockPlayer.Id.ToString())
+            }, "mock"));
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                    HttpContext = new DefaultHttpContext
+                    {
+                        User = _userMock
+                    }
+            };
 
             _lobbyServiceMock.Setup(r => r.GetLobby(It.Is<Guid>(g => g == mockPlayer.Id))).Returns(mockResult);
 

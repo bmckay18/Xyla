@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using Backend.CustomExceptions;
-using Backend.Hubs;
 using Backend.Services.Lobbies.Models;
 using Backend.Services.Notifier;
 using Backend.Services.Token;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Backend.Services.Lobbies
 {
