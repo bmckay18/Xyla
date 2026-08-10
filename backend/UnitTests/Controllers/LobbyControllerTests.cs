@@ -13,7 +13,6 @@ namespace UnitTests.Controllers
     {
         private Mock<ILobbyService> _lobbyServiceMock;
         private LobbyController _controller;
-        private ClaimsPrincipal _userMock;
         private Guid _playerIdMock;
 
         [SetUp]
@@ -23,7 +22,7 @@ namespace UnitTests.Controllers
 
             _playerIdMock = Guid.NewGuid();
 
-            _userMock = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, _playerIdMock.ToString())
             }, "mock"));
@@ -34,7 +33,7 @@ namespace UnitTests.Controllers
                 {
                     HttpContext = new DefaultHttpContext
                     {
-                        User = _userMock
+                        User = user
                     }
                 }
             };
@@ -67,7 +66,7 @@ namespace UnitTests.Controllers
                 Players = new List<Player> { mockPlayer }
             };
 
-            _userMock = new ClaimsPrincipal(new ClaimsIdentity(new[]
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, mockPlayer.Id.ToString())
             }, "mock"));
@@ -76,7 +75,7 @@ namespace UnitTests.Controllers
             {
                     HttpContext = new DefaultHttpContext
                     {
-                        User = _userMock
+                        User = user
                     }
             };
 

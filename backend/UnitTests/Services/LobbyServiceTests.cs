@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using Backend.CustomExceptions;
-using Backend.Hubs;
 using Backend.Mapping;
 using Backend.Services.Lobbies;
 using Backend.Services.Notifier;
 using Backend.Services.Token;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
