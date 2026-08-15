@@ -16,4 +16,10 @@
     <Folder Include="Hubs\Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Services\Game\Imposter\wordList.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
