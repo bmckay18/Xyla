@@ -148,14 +148,7 @@ namespace Backend.Services.Lobbies
 
         public async Task UpdateConnectionId(Guid playerId, string connectionId)
         {
-            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
-
-            if (lobby is null)
-            {
-                return;
-            }
-
-            var player = lobby.Players.First(x => x.Id == playerId);
+            var player = FindPlayer(playerId);
             player.ConnectionId = connectionId;
         }
 
