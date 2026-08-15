@@ -145,5 +145,23 @@ namespace UnitTests.Controllers
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
             _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         }
+
+        [Test]
+        public async Task KickPlayer_CallsLobbyService_WithCorrectData()
+        {
+            var hostId = Guid.NewGuid();
+            var kickedPlayerID = Guid.NewGuid();
+
+            _lobbyServiceMock.Setup(r => r.KickPlayer(It.Is<Guid>(g => g == hostId), It.Is<Guid>(g => g == kickedPlayerID))).Returns(Task.CompletedTask);
+
+            var request = new KickPlayerRequest
+            {
+                KickedPlayerId = kickedPlayerID
+            };
+
+            await _controller.KickPlayerAsync(request);
+
+            _lobbyServiceMock.Verify(r => r.KickPlayer(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
+        }
     }
 }

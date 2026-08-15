@@ -60,5 +60,22 @@ namespace Backend.Controllers
 
             return Ok(lobby);
         }
+
+        [HttpPost]
+        [Authorize]
+        [Route("kick")]
+        public async Task<ActionResult> KickPlayerAsync(KickPlayerRequest request)
+        {
+            var playerIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(playerIdClaim, out var playerId))
+            {
+                return Unauthorized();
+            }
+
+            await _lobbyService.KickPlayer(playerId, request.KickedPlayerId);
+
+            return Ok();
+        }
     }
 }

@@ -102,6 +102,18 @@ app.UseExceptionHandler(appError =>
             await context.Response.WriteAsync(exception.Message);
             return;
         }
+        else if (exception is ForbiddenException)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync(exception.Message);
+            return;
+        }
+        else if (exception is NotFoundException)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsync(exception.Message);
+            return;
+        }
 
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         await context.Response.WriteAsync(exception?.Message ?? "An internal server error occurred");

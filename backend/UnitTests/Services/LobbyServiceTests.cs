@@ -165,5 +165,33 @@ namespace UnitTests.Services
             Assert.That(observedLobby, Is.Not.Null);
             Assert.That(newLobbyState!.Players.Count, Is.EqualTo(1));
         }
+
+        [Test]
+        public async Task KickPlayer_KicksRelevantPlayer_WhenRequestPlayerIsHost()
+        {
+            var lobby = _service.CreateLobby("user 123", null);
+
+            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+
+            await _service.KickPlayer(lobby.PlayerId, observedLobby!.PlayerId);
+
+            var newLobbyState = _service.GetLobby(lobby.PlayerId);
+
+            Assert.That(observedLobby, Is.Not.Null);
+            Assert.That(newLobbyState!.Players.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task KickPlayer_ThrowsForbiddenException_WhenRequestPlayerIsNotHost()
+        {
+            var lobby = _service.CreateLobby("user 123", null);
+
+            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+
+            Assert.ThrowsAsync<ForbiddenException>(async () =>
+            {
+                await _service.KickPlayer(observedLobby!.PlayerId, lobby.PlayerId);
+            });
+        }
     }
 }

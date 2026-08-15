@@ -6,6 +6,7 @@ namespace Backend.Services.Notifier
     {
         Task PlayerJoined(Guid lobbyId, Player player);
         Task PlayerLeft(Guid lobbyId, Player player);
-        Task SendNotification(Guid lobbyId, string messageType, object messageData);
+        Task SendClientNotification(string connectionId, string messageType, object? messageData);
+        Task SendLobbyNotification(Guid lobbyId, string messageType, object? messageData);
     }
 }
