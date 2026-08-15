@@ -51,7 +51,7 @@ namespace Backend.Controllers
         [Route("join")]
         public async Task<ActionResult<LobbyDto>> JoinLobbyAsync(JoinLobbyRequest request)
         {
-            var lobby = await _lobbyService.JoinLobby(request.DisplayName, request.LobbyId, request.Password);
+            var lobby = await _lobbyService.JoinLobbyAsync(request.DisplayName, request.LobbyId, request.Password);
 
             if (lobby is null)
             {
@@ -73,7 +73,7 @@ namespace Backend.Controllers
                 return Unauthorized();
             }
 
-            await _lobbyService.KickPlayer(playerId, request.KickedPlayerId);
+            await _lobbyService.KickPlayerAsync(playerId, request.KickedPlayerId);
 
             return Ok();
         }

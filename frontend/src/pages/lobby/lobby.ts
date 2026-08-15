@@ -20,7 +20,7 @@ if (!playerId) {
 
 setupSignalRNotifications();
 await startSignalR();
-await connection.invoke('JoinLobby');
+await connection.invoke('JoinLobbyAsync');
 
 
 lobbyState = await fetchLobbyState();

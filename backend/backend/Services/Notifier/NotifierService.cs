@@ -13,7 +13,7 @@ namespace Backend.Services.Notifier
             _hub = hub;
         }
 
-        public async Task SendLobbyNotification(Guid lobbyId, string messageType, object? messageData)
+        public async Task SendLobbyNotificationAsync(Guid lobbyId, string messageType, object? messageData)
         {
             if (messageData is not null)
             {
@@ -25,7 +25,7 @@ namespace Backend.Services.Notifier
                     .SendAsync(messageType);
         }
 
-        public async Task SendClientNotification(string connectionId, string messageType, object? messageData)
+        public async Task SendClientNotificationAsync(string connectionId, string messageType, object? messageData)
         {
             if (messageData is not null)
             {
@@ -39,12 +39,12 @@ namespace Backend.Services.Notifier
 
         public async Task PlayerJoined(Guid lobbyId, Player player)
         {
-            await SendLobbyNotification(lobbyId, "PlayerJoined", player);
+            await SendLobbyNotificationAsync(lobbyId, "PlayerJoined", player);
         }
 
         public async Task PlayerLeft(Guid lobbyId, Player player)
         {
-            await SendLobbyNotification(lobbyId, "PlayerLeft", player);
+            await SendLobbyNotificationAsync(lobbyId, "PlayerLeft", player);
         }
     }
 }

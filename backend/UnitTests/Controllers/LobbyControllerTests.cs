@@ -103,7 +103,7 @@ namespace UnitTests.Controllers
         }
 
         [Test]
-        public async Task JoinLobby_CallsLobbyService_WithValidData()
+        public async Task JoinLobbyAsync_CallsLobbyService_WithValidData()
         {
             var lobbyId = Guid.NewGuid();
             var playerId = Guid.NewGuid();
@@ -122,18 +122,18 @@ namespace UnitTests.Controllers
                 Password = "test123"
             };
 
-            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).ReturnsAsync(lobbyDto);
+            _lobbyServiceMock.Setup(r => r.JoinLobbyAsync(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>())).ReturnsAsync(lobbyDto);
 
             var result = await _controller.JoinLobbyAsync(request);
 
             Assert.That(result, Is.Not.Null);
-            _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>()), Times.Once);
+            _lobbyServiceMock.Verify(r => r.JoinLobbyAsync(It.IsAny<string>(), It.Is<Guid>(g => g == lobbyId), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
-        public async Task JoinLobby_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
+        public async Task JoinLobbyAsync_ReturnsNotFoundResult_WhenLobbyDoesNotExist()
         {
-            _lobbyServiceMock.Setup(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync((LobbyDto?)null);
+            _lobbyServiceMock.Setup(r => r.JoinLobbyAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>())).ReturnsAsync((LobbyDto?)null);
 
             var result = await _controller.JoinLobbyAsync(new JoinLobbyRequest
             {
@@ -143,16 +143,16 @@ namespace UnitTests.Controllers
             });
 
             Assert.That(result.Result, Is.TypeOf<NotFoundResult>());
-            _lobbyServiceMock.Verify(r => r.JoinLobby(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
+            _lobbyServiceMock.Verify(r => r.JoinLobbyAsync(It.IsAny<string>(), It.IsAny<Guid>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
-        public async Task KickPlayer_CallsLobbyService_WithCorrectData()
+        public async Task KickPlayerAsync_CallsLobbyService_WithCorrectData()
         {
             var hostId = Guid.NewGuid();
             var kickedPlayerID = Guid.NewGuid();
 
-            _lobbyServiceMock.Setup(r => r.KickPlayer(It.Is<Guid>(g => g == hostId), It.Is<Guid>(g => g == kickedPlayerID))).Returns(Task.CompletedTask);
+            _lobbyServiceMock.Setup(r => r.KickPlayerAsync(It.Is<Guid>(g => g == hostId), It.Is<Guid>(g => g == kickedPlayerID))).Returns(Task.CompletedTask);
 
             var request = new KickPlayerRequest
             {
@@ -161,7 +161,7 @@ namespace UnitTests.Controllers
 
             await _controller.KickPlayerAsync(request);
 
-            _lobbyServiceMock.Verify(r => r.KickPlayer(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
+            _lobbyServiceMock.Verify(r => r.KickPlayerAsync(It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Once);
         }
     }
 }
