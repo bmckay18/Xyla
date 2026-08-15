@@ -61,13 +61,13 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task JoinLobby_SuccessfullyAddsUser()
+        public async Task JoinLobbyAsync_SuccessfullyAddsUser()
         {
             var userName = "user 123";
 
             var lobby = _service.CreateLobby(userName, null);
 
-            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, null);
+            var retrievedLobby = await _service.JoinLobbyAsync("joined user", lobby.LobbyId, null);
             var newLobbyData = _service.GetLobby(lobby.PlayerId);
 
             Assert.That(retrievedLobby, Is.Not.Null);
@@ -78,21 +78,21 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task JoinLobby_AddsUserToLobby_WhenCorrectPasswordProvided()
+        public async Task JoinLobbyAsync_AddsUserToLobby_WhenCorrectPasswordProvided()
         {
             var userName = "user 123";
             var password = "abc123";
 
             var lobby = _service.CreateLobby(userName, password);
 
-            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, password);
+            var retrievedLobby = await _service.JoinLobbyAsync("joined user", lobby.LobbyId, password);
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.PlayerId, Is.Not.EqualTo(Guid.Empty));
         }
 
         [Test]
-        public void JoinLobby_ThrowsBadRequestException_WhenWrongPasswordSupplied()
+        public void JoinLobbyAsync_ThrowsBadRequestException_WhenWrongPasswordSupplied()
         {
             var userName = "user 123";
             var password = "abc123";
@@ -101,25 +101,25 @@ namespace UnitTests.Services
 
             Assert.ThrowsAsync<BadRequestException>(async () =>
             {
-                await _service.JoinLobby("joined user", lobby.LobbyId, "an invalid password");
+                await _service.JoinLobbyAsync("joined user", lobby.LobbyId, "an invalid password");
             });
         }
 
         [Test]
-        public async Task JoinLobby_AddsUserToLobby_WhenPasswordProvidedForNonPasswordLobby()
+        public async Task JoinLobbyAsync_AddsUserToLobby_WhenPasswordProvidedForNonPasswordLobby()
         {
             var userName = "user 123";
 
             var lobby = _service.CreateLobby(userName, null);
 
-            var retrievedLobby = await _service.JoinLobby("joined user", lobby.LobbyId, "a password");
+            var retrievedLobby = await _service.JoinLobbyAsync("joined user", lobby.LobbyId, "a password");
 
             Assert.That(retrievedLobby, Is.Not.Null);
             Assert.That(retrievedLobby.PlayerId, Is.Not.EqualTo(Guid.Empty));
         }
 
         [Test]
-        public void JoinLobby_ThrowsBadRequestException_WhenUserAttemptsToJoinWithSameUsernameAsExistingPlayer()
+        public void JoinLobbyAsync_ThrowsBadRequestException_WhenUserAttemptsToJoinWithSameUsernameAsExistingPlayer()
         {
             var userName = "user 123";
 
@@ -127,7 +127,7 @@ namespace UnitTests.Services
 
             Assert.ThrowsAsync<BadRequestException>(async () =>
             {
-                await _service.JoinLobby(userName, lobby.LobbyId, null);
+                await _service.JoinLobbyAsync(userName, lobby.LobbyId, null);
             });
         }
 
@@ -152,13 +152,13 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task LeaveLobby_RemovesPlayerFromLobby()
+        public async Task LeaveLobbyAsync_RemovesPlayerFromLobby()
         {
             var lobby = _service.CreateLobby("user 123", null);
 
-            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+            var observedLobby = await _service.JoinLobbyAsync("leaving player", lobby.LobbyId, null);
 
-            await _service.LeaveLobby(observedLobby!.PlayerId);
+            await _service.LeaveLobbyAsync(observedLobby!.PlayerId);
 
             var newLobbyState = _service.GetLobby(lobby.PlayerId);
 
@@ -167,13 +167,13 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task KickPlayer_KicksRelevantPlayer_WhenRequestPlayerIsHost()
+        public async Task KickPlayerAsync_KicksRelevantPlayer_WhenRequestPlayerIsHost()
         {
             var lobby = _service.CreateLobby("user 123", null);
 
-            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+            var observedLobby = await _service.JoinLobbyAsync("leaving player", lobby.LobbyId, null);
 
-            await _service.KickPlayer(lobby.PlayerId, observedLobby!.PlayerId);
+            await _service.KickPlayerAsync(lobby.PlayerId, observedLobby!.PlayerId);
 
             var newLobbyState = _service.GetLobby(lobby.PlayerId);
 
@@ -182,15 +182,15 @@ namespace UnitTests.Services
         }
 
         [Test]
-        public async Task KickPlayer_ThrowsForbiddenException_WhenRequestPlayerIsNotHost()
+        public async Task KickPlayerAsync_ThrowsForbiddenException_WhenRequestPlayerIsNotHost()
         {
             var lobby = _service.CreateLobby("user 123", null);
 
-            var observedLobby = await _service.JoinLobby("leaving player", lobby.LobbyId, null);
+            var observedLobby = await _service.JoinLobbyAsync("leaving player", lobby.LobbyId, null);
 
             Assert.ThrowsAsync<ForbiddenException>(async () =>
             {
-                await _service.KickPlayer(observedLobby!.PlayerId, lobby.PlayerId);
+                await _service.KickPlayerAsync(observedLobby!.PlayerId, lobby.PlayerId);
             });
         }
     }

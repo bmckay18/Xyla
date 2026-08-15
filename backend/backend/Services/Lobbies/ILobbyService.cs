@@ -7,9 +7,9 @@ namespace Backend.Services.Lobbies
         LobbyDto CreateLobby(string host, string? password);
         LobbyDetailsDto? GetLobby(Guid playerId);
         Guid? GetLobbyId(Guid playerId);
-        Task<LobbyDto?> JoinLobby(string displayName, Guid lobbyId, string? password);
-        Task KickPlayer(Guid hostPlayerId, Guid kickPlayerId);
-        Task LeaveLobby(Guid playerId);
-        Task UpdateConnectionId(Guid playerId, string connectionId);
+        Task<LobbyDto?> JoinLobbyAsync(string displayName, Guid lobbyId, string? password);
+        Task KickPlayerAsync(Guid hostPlayerId, Guid kickPlayerId);
+        Task LeaveLobbyAsync(Guid playerId);
+        Task UpdateConnectionIdAsync(Guid playerId, string connectionId);
     }
 }

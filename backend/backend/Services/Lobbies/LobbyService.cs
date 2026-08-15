@@ -76,7 +76,7 @@ namespace Backend.Services.Lobbies
             return lobby.Id;
         }
 
-        public async Task<LobbyDto?> JoinLobby(string displayName, Guid lobbyId, string? password)
+        public async Task<LobbyDto?> JoinLobbyAsync(string displayName, Guid lobbyId, string? password)
         {
             var lobby = _lobbies.FirstOrDefault(x => x.Id == lobbyId);
 
@@ -106,7 +106,7 @@ namespace Backend.Services.Lobbies
             };
         }
 
-        public async Task LeaveLobby(Guid playerId)
+        public async Task LeaveLobbyAsync(Guid playerId)
         {
             var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
 
@@ -122,7 +122,7 @@ namespace Backend.Services.Lobbies
             await _notifier.PlayerLeft(lobby.Id, player);
         }
         
-        public async Task KickPlayer(Guid hostPlayerId, Guid kickPlayerId)
+        public async Task KickPlayerAsync(Guid hostPlayerId, Guid kickPlayerId)
         {
             var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == hostPlayerId));
 
@@ -138,15 +138,15 @@ namespace Backend.Services.Lobbies
 
             var player = FindPlayer(kickPlayerId);
 
-            await LeaveLobby(kickPlayerId);
+            await LeaveLobbyAsync(kickPlayerId);
 
             if (player.ConnectionId is not null)
             {
-                await _notifier.SendClientNotification(player.ConnectionId, "Kicked", null);
+                await _notifier.SendClientNotificationAsync(player.ConnectionId, "Kicked", null);
             }
         }
 
-        public async Task UpdateConnectionId(Guid playerId, string connectionId)
+        public async Task UpdateConnectionIdAsync(Guid playerId, string connectionId)
         {
             var player = FindPlayer(playerId);
             player.ConnectionId = connectionId;

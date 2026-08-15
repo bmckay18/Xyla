@@ -14,7 +14,7 @@ namespace Backend.Hubs
             _lobbyService = lobbyService;
         }
 
-        public async Task JoinLobby()
+        public async Task JoinLobbyAsync()
         {
             var playerId = Context.UserIdentifier;
 
@@ -33,7 +33,7 @@ namespace Backend.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString()!);
         }
 
-        public async Task LeaveLobby(string lobbyId)
+        public async Task LeaveLobbyAsync(string lobbyId)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId);
         }
@@ -48,7 +48,7 @@ namespace Backend.Hubs
                 return;
             }
 
-            await _lobbyService.LeaveLobby(id);
+            await _lobbyService.LeaveLobbyAsync(id);
             await base.OnDisconnectedAsync(exception);
         }
 
@@ -62,7 +62,7 @@ namespace Backend.Hubs
                 return;
             }
 
-            await _lobbyService.UpdateConnectionId(id, Context.ConnectionId);
+            await _lobbyService.UpdateConnectionIdAsync(id, Context.ConnectionId);
             await base.OnConnectedAsync();
         }
     }
