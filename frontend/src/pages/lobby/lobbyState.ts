@@ -32,19 +32,12 @@ export function renderPlayers(state: LobbyState): void {
     state.players.forEach((player) => {
         const row = document.createElement('tr');
 
-        const iconCell = document.createElement('td');
-        
-        if (player.id === state.hostId) {
-            iconCell.textContent = 'Host';
-        }
-
         const nameCell = document.createElement('td');
         nameCell.textContent = player.name;
 
-        row.appendChild(iconCell);
         row.appendChild(nameCell);
 
-        if (isHost(state)) {
+        if (isHost(state) && player.id !== state.hostId) {
             const kickButtonCell = document.createElement('td');
             const kickButton = document.createElement('wa-button');
 

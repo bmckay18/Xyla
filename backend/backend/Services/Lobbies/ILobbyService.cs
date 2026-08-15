@@ -10,5 +10,6 @@ namespace Backend.Services.Lobbies
         Task<LobbyDto?> JoinLobby(string displayName, Guid lobbyId, string? password);
         Task KickPlayer(Guid hostPlayerId, Guid kickPlayerId);
         Task LeaveLobby(Guid playerId);
+        Task UpdateConnectionId(Guid playerId, string connectionId);
     }
 }

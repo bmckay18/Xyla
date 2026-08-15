@@ -136,7 +136,39 @@ namespace Backend.Services.Lobbies
                 throw new ForbiddenException("Only the host can kick players.");
             }
 
-            await LeaveLobby(kickPlayerId); // After this, need to disconnect kicked player from the hub
+            var player = FindPlayer(kickPlayerId);
+
+            await LeaveLobby(kickPlayerId);
+
+            if (player.ConnectionId is not null)
+            {
+                await _notifier.SendClientNotification(player.ConnectionId, "Kicked", null);
+            }
+        }
+
+        public async Task UpdateConnectionId(Guid playerId, string connectionId)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
+
+            if (lobby is null)
+            {
+                return;
+            }
+
+            var player = lobby.Players.First(x => x.Id == playerId);
+            player.ConnectionId = connectionId;
+        }
+
+        private Player FindPlayer(Guid playerId)
+        {
+            var lobby = _lobbies.FirstOrDefault(x => x.Players.Any(p => p.Id == playerId));
+
+            if (lobby is null)
+            {
+                throw new BadRequestException("The lobby does not exist.");
+            }
+
+            return lobby.Players.First(x => x.Id == playerId);
         }
 
         private CanJoinLobbyDetails CanJoinLobby(string name, Guid lobbyId, string? password)

@@ -4,5 +4,6 @@
     {
         public Guid Id { get; } = Guid.NewGuid();
         public required string Name { get; set; }
+        public string? ConnectionId { get; set; }
     }
 }

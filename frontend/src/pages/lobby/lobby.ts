@@ -49,4 +49,11 @@ function setupSignalRNotifications(): void {
             renderPlayers(lobbyState);
         }
     });
+
+    connection.on("Kicked", async () => {
+        await connection.stop();
+        sessionStorage.clear();
+
+        window.location.href = "/index.html";
+    })
 }
